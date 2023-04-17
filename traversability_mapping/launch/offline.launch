@@ -1,4 +1,10 @@
 <launch>
+
+     <!-- Corre LeGO -->
+    <arg name="lego" default="true"/>
+
+    <!-- Corre Livox -->
+    <arg name="livox" default="false"/>
     
     <!--- Sim Time -->
     <param name="/use_sim_time" value="true" />
@@ -8,11 +14,32 @@
     <node pkg="tf" type="static_transform_publisher" name="camera_init_to_map"  args="0 0 0 1.570795   0 1.570795 /map /camera_init 10" />
     <node pkg="tf" type="static_transform_publisher" name="base_link_to_camera" args="0 0 0 -1.570795 -1.570795 0 /camera /base_link   10" />
 
-    <!--- Lidar Odometry -->    
-    <node pkg="lego_loam" type="imageProjection"    name="imageProjection"    output="screen"/>
-    <node pkg="lego_loam" type="featureAssociation" name="featureAssociation" output="screen"/>
-    <node pkg="lego_loam" type="mapOptmization"     name="mapOptmization"     output="screen"/>
-    <node pkg="lego_loam" type="transformFusion"    name="transformFusion"    output="screen"/>
+    <!--- Lidar Odometry --> 
+    <group if="$(arg lego)">
+   
+    <node  pkg="lego_loam" type="imageProjection"    name="imageProjection"    output="screen"/>
+    <node  pkg="lego_loam" type="featureAssociation" name="featureAssociation" output="screen"/>
+    <node  pkg="lego_loam" type="mapOptmization"     name="mapOptmization"     output="screen"/>
+    <node  pkg="lego_loam" type="transformFusion"    name="transformFusion"    output="screen"/>
+
+    </group>
+
+    <group if="$(arg livox)">
+
+    <node pkg="livox_mapping" type="loam_scanRegistration" name="scanRegistration" output="screen">
+    </node>
+
+  	<node pkg="livox_mapping" type="loam_laserMapping" name="laserMapping" output="screen">
+  	<param name="map_file_path" type="string" value=" " />
+  	<param name="filter_parameter_corner" type="double" value="0.1" />
+  	<param name="filter_parameter_surf" type="double" value="0.2" />
+  	</node>
+
+    </group>
+
+   
+
+    
 
     <!--- Run Rviz (launch-prefix="nice" for lower cpu usage)-->
     <node pkg="rviz" type="rviz" name="rviz" output="log" args="-d $(find traversability_mapping)/launch/include/traversability_mapping.rviz" />
