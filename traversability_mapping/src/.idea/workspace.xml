@@ -13,9 +13,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d733f3c4-6672-4d50-ad08-33411b9ea33b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../launch/offline.launch" beforeDir="false" afterPath="$PROJECT_DIR$/../launch/offline.launch" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/traversability_filter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/traversability_filter.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/traversability_map.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/traversability_map.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +71,9 @@
       <workItem from="1681899640242" duration="669000" />
       <workItem from="1681902816858" duration="2269000" />
       <workItem from="1681906066408" duration="19000" />
-      <workItem from="1681906670598" duration="2251000" />
+      <workItem from="1681906670598" duration="2257000" />
+      <workItem from="1681977411120" duration="1029000" />
+      <workItem from="1681980770487" duration="1703000" />
     </task>
     <servers />
   </component>

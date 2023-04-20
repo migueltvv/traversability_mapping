@@ -51,6 +51,7 @@ public:
         mapArrayCount(0){
         // subscribe to traversability filter
         subFilteredGroundCloud = nh.subscribe<sensor_msgs::PointCloud2>("/filtered_pointcloud", 5, &TraversabilityMapping::cloudHandler, this);
+        //subFilteredGroundCloud = nh.subscribe<sensor_msgs::PointCloud2>("/filtered_pointcloud", 5, &TraversabilityMapping::cloudHandler, this);
         // publish local occupancy and elevation grid map
         pubOccupancyMapLocal = nh.advertise<nav_msgs::OccupancyGrid> ("/occupancy_map_local", 5);
         pubOccupancyMapLocalHeight = nh.advertise<elevation_msgs::OccupancyElevation> ("/occupancy_map_local_height", 5);

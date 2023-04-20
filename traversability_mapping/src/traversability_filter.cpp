@@ -42,7 +42,8 @@ public:
         nh("~"){
 
         //subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/full_cloud_info", 5, &TraversabilityFilter::cloudHandler, this);
-        subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/velodyne_cloud_registered", 5, &TraversabilityFilter::cloudHandler, this);
+        subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/velodyne_cloud_registered", 5, &TraversabilityFilter::cloudHandler, this); //LIVOX
+
         pubCloud = nh.advertise<sensor_msgs::PointCloud2> ("/filtered_pointcloud", 5);
         pubCloudVisualHiRes = nh.advertise<sensor_msgs::PointCloud2> ("/filtered_pointcloud_visual_high_res", 5);
         pubCloudVisualLowRes = nh.advertise<sensor_msgs::PointCloud2> ("/filtered_pointcloud_visual_low_res", 5);
