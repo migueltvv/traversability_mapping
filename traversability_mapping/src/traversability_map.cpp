@@ -51,8 +51,7 @@ public:
         mapArrayCount(0){
         // subscribe to traversability filter
         subFilteredGroundCloud = nh.subscribe<sensor_msgs::PointCloud2>("/filtered_pointcloud", 5, &TraversabilityMapping::cloudHandler, this);
-        //subFilteredGroundCloud = nh.subscribe<sensor_msgs::PointCloud2>("/filtered_pointcloud", 5, &TraversabilityMapping::cloudHandler, this);
-        // publish local occupancy and elevation grid map
+        // publish local occupancy and elevation grid map0
         pubOccupancyMapLocal = nh.advertise<nav_msgs::OccupancyGrid> ("/occupancy_map_local", 5);
         pubOccupancyMapLocalHeight = nh.advertise<elevation_msgs::OccupancyElevation> ("/occupancy_map_local_height", 5);
         // publish elevation map for visualization
@@ -457,7 +456,7 @@ public:
     }    
 
     bool getRobotPosition(){
-        try{listener.lookupTransform("map","base_link", ros::Time(0), transform); } 
+        try{listener.lookupTransform("map","base_link", ros::Time(0), transform); }
         catch (tf::TransformException ex){ ROS_ERROR("Transfrom Failure."); return false; }
 
         robotPoint.x = transform.getOrigin().x();

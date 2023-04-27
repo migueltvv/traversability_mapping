@@ -1,0 +1,204 @@
+<?xml version="1.0"?>
+<robot name="sensor_box">
+
+  <!-- ..Material Definitions.. -->
+  <material name="black">
+    <color rgba="0 0 0 1" />
+  </material>
+
+  <material name="white">
+    <color rgba="1 1 1 1" />
+  </material>
+
+  <!-- SENSOR BOX KIT -->
+  <link name="base_sensor_box"> <!--REFERENCE FRAME FOR THE SENSING KIT!-->
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://fruc_dataset_choupal_launch/mesh/sensor_box.stl"
+          scale="0.001 0.001 0.001" />
+      </geometry>
+      <material name="white" />
+    </visual>
+  </link>
+
+
+  <!-- SENSOR LINKS (from bottom to top) -->
+
+  <link name="base_link" />
+  <link name="realsense_link" />
+  <link name="realsense_bottom_screw_frame" />
+  <link name="xsens_base" />
+  <link name="xsens_frame" />
+  <link name="mynteye_bottom_screw_frame" />
+  <link name="mynteye_link" />
+  <link name="livox_frame" />
+  <link name="smartphone_frame" />
+
+
+  <link name="realsense_depth_frame" />
+  <link name="realsense_depth_optical_frame" />
+  <link name="realsense_color_frame" />
+  <link name="realsense_color_optical_frame" />
+  <link name="realsense_gyro_frame" />
+  <link name="realsense_gyro_optical_frame" />
+  <link name="realsense_accel_frame" />
+  <link name="realsense_accel_optical_frame" />
+
+  <link name="mynteye_left_frame" />
+  <link name="mynteye_left_rect_frame" />
+  <link name="mynteye_right_frame" />
+  <link name="mynteye_right_rect_frame" />
+  <link name="mynteye_depth_frame" />
+
+
+  <!-- JOINT DEFINITIONS/STATIC TFs -->
+
+  <!-- CREATE THE BASE LINK-->
+  <joint name="base_link_to_base_sensor_box" type="fixed">
+    <parent link="base_link" />
+    <child link="base_sensor_box" />
+    <origin rpy="0 0 0" xyz="0 0 0" />
+  </joint>
+
+  <!-- REALSENSE LINKS/TFs-->
+  <joint name="base_sensor_box_to_realsense" type="fixed">
+    <parent link="base_sensor_box" />
+    <child link="realsense_bottom_screw_frame" />
+    <origin rpy="0 0 0" xyz="0.03610 0.018 0.03174" />
+  </joint>
+
+  <joint name="base_link_to_smatphone_frame" type="fixed">
+    <parent link="base_link" />
+    <child link="smartphone_frame" />
+    <origin rpy="0 0 0" xyz="0 0 0" />
+  </joint>
+
+  <!-- camera body, with origin at bottom screw mount -->
+  <joint name="realsense_bottom_screw_to_realsense" type="fixed">
+    <parent link="realsense_bottom_screw_frame" />
+    <child link="realsense_link" />
+    <origin rpy="0 0 0" xyz="0.0149 0.00175 0.00125" />
+  </joint>
+
+  <!-- XSENS LINKS -->
+  <joint name="base_sensor_box_to_xsens" type="fixed">
+    <parent link="base_sensor_box" />
+    <child link="xsens_base" />
+    <origin rpy="0 0 1.5708" xyz="-0.0285 0.0482 0" />
+  </joint>
+
+  <!-- Transforms the original Xsens frame to the middle of the base -->
+  <joint name="xsens_to_original_xsense" type="fixed">
+    <origin xyz="-0.01735 0.0061 0.0095" rpy="0.0 0.0 0.0" />
+    <parent link="xsens_base" />
+    <child link="xsens_frame" />
+  </joint>
+
+  <!-- MYNTEYE LINKS -->
+  <joint name="base_sensor_box_to_mynt_bottom_screw" type="fixed">
+    <parent link="base_sensor_box" />
+    <child link="mynteye_bottom_screw_frame" />
+    <origin rpy="0 0 -0.82" xyz="-0.0015 0.035 0.140" />
+  </joint>
+
+  <joint name="mynt_bottom_link_to_mynt_link" type="fixed">
+    <origin xyz="-0.0628 0.0105 0.0136" rpy="0 0 0" />
+    <parent link="mynteye_bottom_screw_frame" />
+    <child link="mynteye_link" />
+  </joint>
+
+  <!-- LIVOX MID-70 LINK -->
+  <joint name="base_sensor_box_to_livox" type="fixed">
+    <parent link="base_sensor_box" />
+    <child link="livox_frame" />
+    <origin rpy="0 0 0" xyz="0.0404 0 0.264" />
+  </joint>
+  <!--SENSOR STATIC TFs-->
+
+  <!--RealSense-->
+  <joint name="realsense_link_to_depth_frame" type="fixed">
+    <parent link="realsense_link" />
+    <child link="realsense_depth_frame" />
+    <origin rpy="0 0 0" xyz="0.0 -0 -0" />
+  </joint>
+
+  <joint name="realsense_depth_frame_to_realsense_depth_optical_frame" type="fixed">
+    <parent link="realsense_depth_frame" />
+    <child link="realsense_depth_optical_frame" />
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0.0 -0 -0" />
+  </joint>
+
+  <joint name="realsense_link_to_realsense_color_frame" type="fixed">
+    <parent link="realsense_link" />
+    <child link="realsense_color_frame" />
+    <origin rpy="0.002 0.002 0.001"
+      xyz="-0.0006720353849232197 0.014587940648198128 0.0001742841413943097" />
+  </joint>
+
+  <joint name="realsense_color_frame_to_realsense_color_optical_frame" type="fixed">
+    <parent link="realsense_color_frame" />
+    <child link="realsense_color_optical_frame" />
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0.0 -0 -0" />
+  </joint>
+
+  <joint name="realsense_link_to_realsense_gyro_frame" type="fixed">
+    <parent link="realsense_link" />
+    <child link="realsense_gyro_frame" />
+    <origin rpy="0 0 0" xyz="-0.011739999987185001 -0.005520000122487545 0.005100000184029341" />
+  </joint>
+
+  <joint name="realsense_gyro_frame_to_realsense_gyro_optical_frame" type="fixed">
+    <parent link="realsense_gyro_frame" />
+    <child link="realsense_gyro_optical_frame" />
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0.0 -0 -0" />
+  </joint>
+
+  <joint name="realsense_link_to_realsense_accel_frame" type="fixed">
+    <parent link="realsense_link" />
+    <child link="realsense_accel_frame" />
+    <origin rpy="0 0 0" xyz="-0.011739999987185001 -0.005520000122487545 0.005100000184029341" />
+  </joint>
+
+  <joint name="realsense_accel_frame_to_realsense_accel_optical_frame" type="fixed">
+    <parent link="realsense_accel_frame" />
+    <child link="realsense_accel_optical_frame" />
+    <origin rpy="-1.5707963267948966 0 -1.5707963267948966" xyz="0.0 -0 -0" />
+  </joint>
+
+  <!--Mynt Eye-->
+  <joint name="mynteye_link_frame_to_mynteye_left_frame" type="fixed">
+    <parent link="mynteye_link" />
+    <child link="mynteye_left_frame" />
+    <origin rpy="0 0 0" xyz="0.0 0 0" />
+  </joint>
+
+  <joint name="mynteye__left_frame_to_mynteye_left_rect_frame" type="fixed">
+    <parent link="mynteye_left_frame" />
+    <child link="mynteye_left_rect_frame" />
+    <origin rpy="0 0 0" xyz="0 0 0" />
+  </joint>
+
+  <joint name="mynteye_link_frame_to_mynteye_right_frame" type="fixed">
+    <parent link="mynteye_link" />
+    <child link="mynteye_right_frame" />
+    <origin rpy="-0.0000719 0.0031179 0.0056681"
+      xyz="0.12023761946731726 -0.0004781963335652241 6.013715114786039e-05" />
+  </joint>
+
+  <joint name="mynteye__right_frame_to_mynteye_right_rect_frame" type="fixed">
+    <parent link="mynteye_right_frame" />
+    <child link="mynteye_right_rect_frame" />
+    <origin rpy="0 0 0" xyz="0 0 0" />
+  </joint>
+
+  <joint name="mynteye_left_frame_to_mynteye_depth_frame" type="fixed">
+    <parent link="mynteye_left_frame" />
+    <child link="mynteye_depth_frame" />
+    <origin rpy="-1.5708 0 0" xyz="0.0 0 0" />
+  </joint>
+
+
+</robot>

@@ -13,6 +13,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d733f3c4-6672-4d50-ad08-33411b9ea33b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../launch/include/traversability_mapping2.rviz" beforeDir="false" afterPath="$PROJECT_DIR$/../launch/include/traversability_mapping2.rviz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../launch/offline.launch" beforeDir="false" afterPath="$PROJECT_DIR$/../launch/offline.launch" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/traversability_filter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/traversability_filter.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/traversability_map.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/traversability_map.cpp" afterDir="false" />
@@ -73,7 +75,13 @@
       <workItem from="1681906066408" duration="19000" />
       <workItem from="1681906670598" duration="2257000" />
       <workItem from="1681977411120" duration="1029000" />
-      <workItem from="1681980770487" duration="1703000" />
+      <workItem from="1681980770487" duration="3817000" />
+      <workItem from="1681995369790" duration="35000" />
+      <workItem from="1682001761256" duration="1680000" />
+      <workItem from="1682073866368" duration="1058000" />
+      <workItem from="1682338823127" duration="5676000" />
+      <workItem from="1682352365635" duration="538000" />
+      <workItem from="1682520587525" duration="4756000" />
     </task>
     <servers />
   </component>

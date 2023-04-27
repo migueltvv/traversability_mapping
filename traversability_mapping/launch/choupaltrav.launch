@@ -1,0 +1,68 @@
+<launch>
+        <arg name="rviz" default="true"/>
+	<arg name="file_path" default="$(find fruc_dataset_choupal_launch)/rosbag"/>
+	<arg name="enable_localization" default="false"/>
+	<arg name="localization_file" default="localization.bag"/>
+	
+
+	<arg name="model" default="$(find traversability_mapping)/urdf/sensor_box.urdf"/>
+	<arg name="rate_factor"  default="1"/>
+ 
+
+	<!-- Start sim time for rosbags -->
+	<param name="use_sim_time" value="true"/>
+
+        <node pkg="rviz" type="rviz" name="rviz" />
+
+	<!--Image transports-->
+    <node pkg="image_transport" 
+		  type="republish" 
+		  name="realsense_rgb" 
+		  args="compressed in:=/realsense/color/image_raw
+		  		raw out:=/realsense/color/image_raw"/> 
+	
+    <node pkg="image_transport" 
+		  type="republish" 
+		  name="realsense_depth" 
+		  args="compressedDepth in:=/realsense/aligned_depth_to_color/image_raw
+		        raw out:=/realsense/aligned_depth_to_color/image_raw"/>
+
+	<node pkg="image_transport" 
+	  type="republish" 
+	  name="mynteye_left" 
+	  args="compressed in:=mynteye/left_rect/image_rect
+	  		raw out:=mynteye/left_rect/image_rect"/> 
+	
+	<node pkg="image_transport" 
+	  type="republish" 
+	  name="mynteye_right" 
+	  args="compressed in:=mynteye/right_rect/image_rect
+	  		raw out:=mynteye/right_rect/image_rect"/> 
+
+
+	<!-- Generate Realsense's Point Cloud from Depth-->
+	<node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
+  	<node pkg="nodelet" type="nodelet" name="realsense_depth2cloud"
+  	      args="load depth_image_proc/point_cloud_xyzrgb nodelet_manager">
+  	  <remap from="rgb/camera_info" to="/realsense/color/camera_info"/>
+  	  <remap from="rgb/image_rect_color" to="/realsense/color/image_raw"/>
+
+	  <remap from="depth_registered/image_rect" to="/realsense/aligned_depth_to_color/image_raw"/>
+  	  <remap from="depth_registered/points" to="/realsense/depth/points"/>
+  	</node>
+	
+	<!-- Generate Mynteye's Point Cloud from Depth-->
+	<node pkg="nodelet" type="nodelet" name="mynt_depth2cloud"
+  	      args="load depth_image_proc/point_cloud_xyz nodelet_manager">
+  	  <remap from="camera_info" to="/mynteye/depth/camera_info"/>
+  	  <remap from="image_rect" to="/mynteye/depth/image_raw"/>
+  	  <remap from="points" to="/mynteye/depth/points"/>
+  	</node>
+
+	<param name="robot_description" textfile="$(arg model)" />
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+            <remap from="joint_state" to="joint_state"/>
+            <param name="publish_frequency" type="double" value="15.0"/>
+    </node>
+
+</launch>

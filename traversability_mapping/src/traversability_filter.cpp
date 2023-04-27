@@ -41,8 +41,8 @@ public:
     TraversabilityFilter():
         nh("~"){
 
-        //subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/full_cloud_info", 5, &TraversabilityFilter::cloudHandler, this);
-        subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/velodyne_cloud_registered", 5, &TraversabilityFilter::cloudHandler, this); //LIVOX
+        subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/full_cloud_info", 5, &TraversabilityFilter::cloudHandler, this);
+        //subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/velodyne_cloud_registered", 5, &TraversabilityFilter::cloudHandler, this); //LIVOX
 
         pubCloud = nh.advertise<sensor_msgs::PointCloud2> ("/filtered_pointcloud", 5);
         pubCloudVisualHiRes = nh.advertise<sensor_msgs::PointCloud2> ("/filtered_pointcloud_visual_high_res", 5);
@@ -148,8 +148,8 @@ public:
 
     bool transformCloud(){
         // Listen to the TF transform and prepare for point cloud transformation
-        try{listener.lookupTransform("map","base_link", ros::Time(0), transform); }
-        catch (tf::TransformException ex){ /*ROS_ERROR("Transfrom Failure.");*/ return false; }
+        try{listener.lookupTransform("map","base_link", ros::Time(0), transform);}
+        catch (tf::TransformException ex){ROS_WARN("Transfrom Failure."); return false; }
 
         robotPoint.x = transform.getOrigin().x();
         robotPoint.y = transform.getOrigin().y();
@@ -321,7 +321,7 @@ public:
             sensor_msgs::PointCloud2 laserCloudTemp;
             pcl::toROSMsg(*laserCloudOut, laserCloudTemp);
             laserCloudTemp.header.stamp = ros::Time::now();
-            laserCloudTemp.header.frame_id = "map";
+            laserCloudTemp.header.frame_id = "camera_init";
             pubCloudVisualHiRes.publish(laserCloudTemp);
         }
     }
