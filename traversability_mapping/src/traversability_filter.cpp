@@ -151,7 +151,7 @@ public:
 
     bool transformCloud(){
         // Listen to the TF transform and prepare for point cloud transformation
-        try{listener.lookupTransform("camera_init","base_link", ros::Time(0), transform);}
+        try{listener.lookupTransform("map","base_link", ros::Time(0), transform);}
         catch (tf::TransformException ex){ROS_WARN("Transform1 Failure.");return false; }
 
         robotPoint.x = transform.getOrigin().x();
@@ -324,7 +324,7 @@ public:
             sensor_msgs::PointCloud2 laserCloudTemp;
             pcl::toROSMsg(*laserCloudOut, laserCloudTemp);
             laserCloudTemp.header.stamp = ros::Time::now();
-            laserCloudTemp.header.frame_id = "camera_init";
+            laserCloudTemp.header.frame_id = "map";
             pubCloudVisualHiRes.publish(laserCloudTemp);
         }
     }
@@ -391,7 +391,7 @@ public:
             sensor_msgs::PointCloud2 laserCloudTemp;
             pcl::toROSMsg(*laserCloudOut, laserCloudTemp);
             laserCloudTemp.header.stamp = ros::Time::now();
-            laserCloudTemp.header.frame_id = "camera_init";
+            laserCloudTemp.header.frame_id = "map";
             pubCloudVisualLowRes.publish(laserCloudTemp);
         }
     }
@@ -517,10 +517,10 @@ public:
 
     void updateLaserScan(){
 
-        try{listener.lookupTransform("base_link","camera_init", ros::Time(0), transform);}
+        try{listener.lookupTransform("base_link","map", ros::Time(0), transform);}
         catch (tf::TransformException ex){ /*ROS_ERROR("Transform2 Failure.");*/ return; }
 
-        laserCloudObstacles->header.frame_id = "camera_init";
+        laserCloudObstacles->header.frame_id = "map";
         laserCloudObstacles->header.stamp = 0;
         // transform obstacle cloud back to "base_link" frame
         pcl::PointCloud<PointType> laserCloudTemp;

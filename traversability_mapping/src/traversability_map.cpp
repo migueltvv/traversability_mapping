@@ -457,7 +457,7 @@ public:
     }    
 
     bool getRobotPosition(){
-        try{listener.lookupTransform("camera_init","base_link", ros::Time(0), transform); }
+        try{listener.lookupTransform("map","base_link", ros::Time(0), transform); }
         catch (tf::TransformException ex){ ROS_ERROR("Transform3 Failure."); return false; }
 
         robotPoint.x = transform.getOrigin().x();
@@ -498,7 +498,7 @@ public:
         // 3. Publish elevation point cloud
         sensor_msgs::PointCloud2 laserCloudTemp;
         pcl::toROSMsg(*laserCloudElevation, laserCloudTemp);
-        laserCloudTemp.header.frame_id = "/camera_init";
+        laserCloudTemp.header.frame_id = "/map";
         laserCloudTemp.header.stamp = ros::Time::now();
         pubElevationCloud.publish(laserCloudTemp);
         // 4. free memory

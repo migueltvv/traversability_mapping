@@ -16,9 +16,7 @@
       <change beforePath="$PROJECT_DIR$/../launch/offline.launch" beforeDir="false" afterPath="$PROJECT_DIR$/../launch/offline.launch" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/traversability_filter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/traversability_filter.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/traversability_filterlivox.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/traversability_map.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/traversability_map.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/traversability_maplivox.cpp" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +87,7 @@
       <workItem from="1682688747952" duration="4410000" />
       <workItem from="1682953105060" duration="1758000" />
       <workItem from="1682955976308" duration="1007000" />
-      <workItem from="1683033387229" duration="1645000" />
+      <workItem from="1683033387229" duration="2901000" />
     </task>
     <servers />
   </component>
