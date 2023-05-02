@@ -41,8 +41,8 @@ public:
     TraversabilityFilter():
         nh("~"){
 
-        subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/full_cloud_info", 5, &TraversabilityFilter::cloudHandler, this);
-        //subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/velodyne_cloud_registered", 5, &TraversabilityFilter::cloudHandler, this); //LIVOX
+        subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/full_cloud_info", 5, &TraversabilityFilter::cloudHandler, this); // chama a função cloudHandler da classe TravFIlter, ponteiro this passado ao construtor do
+        //subscritor
 
         pubCloud = nh.advertise<sensor_msgs::PointCloud2> ("/filtered_pointcloud", 5);
         pubCloudVisualHiRes = nh.advertise<sensor_msgs::PointCloud2> ("/filtered_pointcloud_visual_high_res", 5);
@@ -110,7 +110,10 @@ public:
         
         extractRawCloud(laserCloudMsg);
 
-        if (transformCloud() == false) return;
+        //bool transformCloudResult = transformCloud();
+        //ROS_INFO("Transform cloud result: %d", transformCloudResult);
+
+        //if (transformCloud() == false) return;
 
         cloud2Matrix();
 
@@ -131,7 +134,7 @@ public:
 
     void extractRawCloud(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg){
         // ROS msg -> PCL cloud
-        pcl::fromROSMsg(*laserCloudMsg, *laserCloudIn);
+        pcl::fromROSMsg(*laserCloudMsg, *laserCloudIn); //Passa o laserCloudin (mensagem ROS) para laserCloudMsg(Pointcloud),
         // extract range info
         for (int i = 0; i < N_SCAN; ++i){
             for (int j = 0; j < Horizon_SCAN; ++j){
@@ -148,8 +151,8 @@ public:
 
     bool transformCloud(){
         // Listen to the TF transform and prepare for point cloud transformation
-        try{listener.lookupTransform("map","base_link", ros::Time(0), transform);}
-        catch (tf::TransformException ex){ROS_WARN("Transfrom Failure."); return false; }
+        try{listener.lookupTransform("camera_init","base_link", ros::Time(0), transform);}
+        catch (tf::TransformException ex){ROS_WARN("Transform1 Failure.");return false; }
 
         robotPoint.x = transform.getOrigin().x();
         robotPoint.y = transform.getOrigin().y();
@@ -166,7 +169,7 @@ public:
     }
 
     void cloud2Matrix(){
-
+        ROS_INFO("\033[1;32m---->\033[0m Cloud2Matrix Started.");
         for (int i = 0; i < N_SCAN; ++i){
             for (int j = 0; j < Horizon_SCAN; ++j){
                 int index = j  + i * Horizon_SCAN;
@@ -179,8 +182,8 @@ public:
     void applyFilter(){
 
         if (urbanMapping == true){
-            positiveCurbFilter();
-            negativeCurbFilter();
+            //positiveCurbFilter();
+            //negativeCurbFilter();
         }
 
         slopeFilter();
@@ -388,7 +391,7 @@ public:
             sensor_msgs::PointCloud2 laserCloudTemp;
             pcl::toROSMsg(*laserCloudOut, laserCloudTemp);
             laserCloudTemp.header.stamp = ros::Time::now();
-            laserCloudTemp.header.frame_id = "map";
+            laserCloudTemp.header.frame_id = "camera_init";
             pubCloudVisualLowRes.publish(laserCloudTemp);
         }
     }
@@ -498,7 +501,7 @@ public:
         sensor_msgs::PointCloud2 laserCloudTemp;
         pcl::toROSMsg(*laserCloudOut, laserCloudTemp);
         laserCloudTemp.header.stamp = ros::Time::now();
-        laserCloudTemp.header.frame_id = "map";
+        laserCloudTemp.header.frame_id = "camera_init";
         pubCloud.publish(laserCloudTemp);
     }
 
@@ -514,10 +517,10 @@ public:
 
     void updateLaserScan(){
 
-        try{listener.lookupTransform("base_link","map", ros::Time(0), transform);}
-        catch (tf::TransformException ex){ /*ROS_ERROR("Transfrom Failure.");*/ return; }
+        try{listener.lookupTransform("base_link","camera_init", ros::Time(0), transform);}
+        catch (tf::TransformException ex){ /*ROS_ERROR("Transform2 Failure.");*/ return; }
 
-        laserCloudObstacles->header.frame_id = "map";
+        laserCloudObstacles->header.frame_id = "camera_init";
         laserCloudObstacles->header.stamp = 0;
         // transform obstacle cloud back to "base_link" frame
         pcl::PointCloud<PointType> laserCloudTemp;

@@ -13,11 +13,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d733f3c4-6672-4d50-ad08-33411b9ea33b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../launch/include/traversability_mapping2.rviz" beforeDir="false" afterPath="$PROJECT_DIR$/../launch/include/traversability_mapping2.rviz" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../launch/offline.launch" beforeDir="false" afterPath="$PROJECT_DIR$/../launch/offline.launch" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/traversability_filter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/traversability_filter.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/traversability_filterlivox.cpp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/traversability_map.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/traversability_map.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/traversability_maplivox.cpp" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,6 +83,13 @@
       <workItem from="1682338823127" duration="5676000" />
       <workItem from="1682352365635" duration="538000" />
       <workItem from="1682520587525" duration="4756000" />
+      <workItem from="1682593330056" duration="7300000" />
+      <workItem from="1682615032539" duration="829000" />
+      <workItem from="1682680611533" duration="6891000" />
+      <workItem from="1682688747952" duration="4410000" />
+      <workItem from="1682953105060" duration="1758000" />
+      <workItem from="1682955976308" duration="1007000" />
+      <workItem from="1683033387229" duration="1645000" />
     </task>
     <servers />
   </component>
