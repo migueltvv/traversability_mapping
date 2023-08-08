@@ -27,7 +27,7 @@
 
   <!-- SENSOR LINKS (from bottom to top) -->
 
-  <link name="base_link" />
+  <link name="base_link2" />
   <link name="realsense_link" />
   <link name="realsense_bottom_screw_frame" />
   <link name="xsens_base" />
@@ -58,7 +58,7 @@
 
   <!-- CREATE THE BASE LINK-->
   <joint name="base_link_to_base_sensor_box" type="fixed">
-    <parent link="base_link" />
+    <parent link="base_link2" /> //editado
     <child link="base_sensor_box" />
     <origin rpy="0 0 0" xyz="0 0 0" />
   </joint>
@@ -71,7 +71,7 @@
   </joint>
 
   <joint name="base_link_to_smatphone_frame" type="fixed">
-    <parent link="base_link" />
+    <parent link="base_link2" /> //editado
     <child link="smartphone_frame" />
     <origin rpy="0 0 0" xyz="0 0 0" />
   </joint>

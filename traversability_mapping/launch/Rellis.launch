@@ -1,0 +1,68 @@
+<launch>
+    
+    <!--- Sim Time -->
+    <param name="/use_sim_time" value="true" />
+    
+    <arg name="file_path" default="$(find traversability_mapping)/rosbag"/>
+
+    
+
+    <arg name="lego" default="false"/>
+
+    <arg name="full_info" default="/full_cloud_info"/>
+
+
+
+        <!-- Rellis 3D -->
+
+	<arg name="america" default="false"/>
+	
+	<arg name="path" default="/home/safe/Desktop/bags" />
+
+
+ 
+
+   <group if="$(arg america)">
+
+      <node pkg="tf" type="static_transform_publisher" name="camera_init_to_map"  args="0 0 0 1.570795   0 1.570795 /map /camera_init 10" /> //1.57 0 1.57
+   
+
+      <node pkg="tf" type="static_transform_publisher" name="base_link_to_camera" args="0 0 0 -1.570795 -1.570795 0 /camera /base_link   10" /> // -1.57 -1.57 0
+
+      <node pkg="tf" type="static_transform_publisher" name="velodyne_base_link" args="0 0 0 0 0 0  /base_link /base_link2 10" /> //1.57 0 0
+
+	
+
+    <!--<remap from="/os1_cloud_node/points" to="/livox/lidar"/> -->
+    <remap from="/velodyne_points" to="/livox/lidar"/> 
+
+    <node pkg="rosbag" type="play" name="choupal_0_bag" args="--clock  /home/safe/Desktop/bags/20200213_trail_2.bag"  output="screen"/>
+
+
+    <node pkg="rviz" type="rviz" name="rviz" output="log" args="-d $(find traversability_mapping)/launch/include/traversability_mappingamerica.rviz" />
+
+ <!--- Lidar Odometry -->    
+    <node pkg="lego_loam" type="imageProjection"    name="imageProjection"    output="screen"/>
+    <node pkg="lego_loam" type="featureAssociation" name="featureAssociation" output="screen"/>
+    <node pkg="lego_loam" type="mapOptmization"     name="mapOptmization"     output="screen"/>
+    <node pkg="lego_loam" type="transformFusion"    name="transformFusion"    output="screen"/>
+	
+
+
+
+
+	</group>
+
+
+    <!--- Run Traversability Mapping -->    
+    <node pkg="traversability_mapping" type="traversability_filter"  name="traversability_filter"  output="screen">
+	<param name="topico_info" value = "$(arg full_info)"/>
+    </node>
+    <node pkg="traversability_mapping" type="traversability_map"     name="traversability_map"     output="screen"/>
+    <node pkg="traversability_mapping" type="traversability_prm"     name="traversability_prm"     output="screen"/>
+    <!-- <node pkg="traversability_mapping" type="traversability_path"    name="traversability_path"    output="screen"/> -->
+
+    <!--- Run Move Base -->
+    <!--<include file="$(find traversability_mapping)/launch/include/move_base.launch" /> -->
+
+</launch>

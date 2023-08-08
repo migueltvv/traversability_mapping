@@ -115,7 +115,7 @@
 
       <node pkg="tf" type="static_transform_publisher" name="base_link_to_camera" args="0 0 0 -1.570795 -1.570795 0 /camera /base_link   10" /> // -1.57 -1.57 0
 
-      <node pkg="tf" type="static_transform_publisher" name="velodyne_base_link" args="0 0 0 0 0 0  /velodyne /base_link2 10" /> //1.57 0 0
+      <node pkg="tf" type="static_transform_publisher" name="velodyne_base_link" args="0 0 0 0 0 0  /base_link /base_link2 10" /> //1.57 0 0
 
 	
 
@@ -144,10 +144,19 @@
 
     <!-- <node pkg="rosbag" type="play" name="ingeniarius" args="  /home/safe/safeforest/src/safeforest_datasets/ros_bags/_2023-02-23-12-23-46_0.bag"  output="screen"/> -->
 
-     <node pkg="rosbag" type="play" name="ingeniarius2022" args="$(find ranger_datasets)/dataset/_2021-11-11-15-10-54_0.bag $(find ranger_datasets)/dataset/_2021-11-11-15-14-10_1.bag $(find ranger_datasets)/dataset/_2021-11-11-15-17-28_2.bag
-	--clock --pause $(find ranger_datasets)/dataset/LI_2022-07-03-15-08-53_slower_rate.bag" output="screen" />
+     <node pkg="rosbag" type="play" name="ingeniarius2022" args="--clock  /home/safe/gitsinced/src/ranger_datasets/dataset/2022_04_04_ranger_trial1.bag" output="screen" />
 
-    <node pkg="rviz" type="rviz" name="rviz" output="log" args="-d $(find traversability_mapping)/launch/include/traversabilityingeniarius.rviz" />
+    <node pkg="tf" type="static_transform_publisher" name="camera_init_to_map"  args="0 0 0 0  0 0 /map /camera_init 10" /> //1.57 0 1.57 //deu bem com 0 0 0
+   
+    <node pkg="tf" type="static_transform_publisher" name="camera_base" args="0 0 0 0 0 0 /camera /base_link   10" /> // -1.57 -1.57 0 // -1,57095 0 0 camera base_link
+
+    <node pkg="tf" type="static_transform_publisher" name="base_base" args="0 0 0 0 0 0 /base_link /bobcat_base   10" /> // -1.57 -1.57 0 // -1,57095 0 0 camera base_link
+
+    <node pkg="tf" type="static_transform_publisher" name="base_lidar" args="0 0 0 0 0 0 /bobcat_base /front_lslidar   10" /> // -1.57 -1.57 0 // -1,57095 0 0 camera base_link	
+
+    <node pkg="tf" type="static_transform_publisher" name="velodyne_base_link" args="0 0 0 0 0 0  /front_lslidar /base_link2 10" /> //1.57 0 0 //1.57095 0 0 base_link - base_link2
+
+    <node pkg="rviz" type="rviz" name="rviz" output="log" args="-d $(find traversability_mapping)/launch/include/traversability_mappingamerica.rviz" />
 
     <!-- Front Ranger dynamic tf  -->
     <node pkg="ranger_datasets" type="republisher_odom_tf" name="robot_tool_republisher_odom_tf"> <!--output="screen"-->
@@ -155,12 +164,6 @@
         <param name="child_frame_id"         type="string"  value="end_effector_link"/>  
         <param name="frame_id"               type="string"  value="bobcat_base"/>  		
     </node>
-
- <node pkg="tf" type="static_transform_publisher" name="front_lslidar_base_link2"  args="0 0 0 0   0 0 /front_lslidar base_link2 10" /> //1.57 0 1.57 
- 
- <!-- <node pkg="tf" type="static_transform_publisher" name="front_lslidar_base_link2"  args="0 0 0 0   0 0 /back_lslidar base_link2 10" /> --> 
-
-   <!--   <node pkg="tf" type="static_transform_publisher" name="base_link_to_camera" args="0 0 0 -1.570795 -1.570795 0 /camera /base_link   10" /> // -1.57 -1.57 0 -->
 
     
 
@@ -209,61 +212,10 @@
 	    <remap from="lslidar_sweep"  to="front_lslidar_sweep"/>
 	    <remap from="lslidar_point_cloud" to="front_lslidar_point_cloud"/>	    
 	</node>
-
-	  <!-- Filter the robot structure on the back lslidar points with a "crop box" -->
-  <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />
-
-  <node pkg="nodelet" type="nodelet" name="crop_box" args="load pcl/CropBox pcl_manager" output="screen">
-        <remap from="~input" to="back_lslidar_point_cloud" />
-        <remap from="~output" to="back_lslidar_point_cloud_filtered" />
-        <rosparam>
-              min_x: -2.5
-              max_x: 0.0
-              min_y: -1.0
-              max_y: 1.0
-              min_z: -1.25
-              max_z: 1.0
-              keep_organized: true
-              negative: true
-        </rosparam>
-   </node>
-
-  <!-- Filter the robot structure on the front lslidar points with a "crop box" -->
-  <node pkg="nodelet" type="nodelet" name="front_pcl_manager" args="manager" output="screen" />
-
-  <node pkg="nodelet" type="nodelet" name="front_crop_box" args="load pcl/CropBox front_pcl_manager" output="screen">
-        <remap from="~input" to="front_lslidar_point_cloud" />
-        <remap from="~output" to="front_lslidar_point_cloud_filtered" />
-        <rosparam>
-              min_x: -30.0 // -1, 2, -1,2, 1,2, -5, 5 // MEU -30 -> 2 -11.2 -> 11.2 -5  -> 5
-              max_x: 2.0
-              min_y: -11.2
-              max_y: 11.2
-              min_z: -5.0
-              max_z: 5.0
-              keep_organized: true
-              negative: true
-        </rosparam>
-   </node>   
-
-	<!-- <node pkg="nodelet" type="nodelet" name="front_crop_box2" args="load pcl/CropBox front_pcl_manager" output="screen">
-        <remap from="~input" to="front_lslidar_point_cloud" />
-        <remap from="~output" to="front_lslidar_point_cloud_filtered" />
-        <rosparam>
-              min_x: -221.0
-              max_x: 222.0
-              min_y: -120.2
-              max_y: 120.2
-              min_z: 3.0
-              max_z: 5.0
-              keep_organized: true
-              negative: true
-        </rosparam>
-   </node>   -->
-
     
 
-
+    <remap from="/front_lslidar_point_cloud" to="/livox/lidar"/> 
+    <remap from="/imu_rion" to="/imu/data"/>
 
     <node pkg="lego_loam" type="imageProjection"    name="imageProjection"    output="screen"/>
     <node pkg="lego_loam" type="featureAssociation" name="featureAssociation" output="screen"/>
@@ -333,69 +285,7 @@
 	<node pkg="tf2_ros" type="static_transform_publisher" name="base_to_gps" 	args="0.0 0 2.0 0 0 0 bobcat_base gps_link"/>
 
     <!-- Radar -->
-	<node pkg="tf2_ros" type="static_transform_publisher" name="base_to_radar" 	args="-0.33 0 1.9 3.09 0 0 bobcat_base navtech"/>
-
-	  <!--Intel Top RealSense Colored PointCloud-->
-   <!--republish compressed images into raw images readable by the point_cloud_xyzrgb nodelet-->
-   <node pkg="image_transport" type="republish" name="camera_repub_image_rect_color" args="compressed in:=camera/color/image_raw raw out:=camera/color/image_raw"/>
-
-   <!-- Get RGBD registered Point Cloud from Intel -->
-   <node pkg="nodelet" type="nodelet" name="camera_colored_pcl" args="manager" output="screen" /> 
- 
-   <node pkg="nodelet" type="nodelet" name="camera_points_xyzrgb" args="load depth_image_proc/point_cloud_xyzrgb camera_colored_pcl --no-bond"> 
-	    <remap from="rgb/camera_info" to="camera/color/camera_info" />   
-	    <remap from="rgb/image_rect_color" to="camera/color/image_raw"/> 
-	    <remap from="depth_registered/image_rect" to="camera/aligned_depth_to_color/image_raw"/>
-	    <remap from="depth_registered/points" to="camera/depth/color/points"/>
-	</node> 
-
-
-   <!--Framos tool RealSense Colored PointCloud-->
-   <!--republish compressed images into raw images readable by the point_cloud_xyzrgb nodelet-->
-   <node pkg="image_transport" type="republish" name="camera_front_tool_repub_image_rect_color" args="compressed in:=camera_tool/color/image_raw raw out:=camera_tool/color/image_raw"/>
-
-   <!-- Get RGBD registered Point Cloud from Intel -->
-   <node pkg="nodelet" type="nodelet" name="camera_front_tool_colored_pcl" args="manager" output="screen" /> 
- 
-   <node pkg="nodelet" type="nodelet" name="camera_front_tool_points_xyzrgb" args="load depth_image_proc/point_cloud_xyzrgb camera_front_tool_colored_pcl --no-bond"> 
-	    <remap from="rgb/camera_info" to="camera_tool/color/camera_info" />   
-	    <remap from="rgb/image_rect_color" to="camera_tool/color/image_raw"/> 
-	    <remap from="depth_registered/image_rect" to="camera_tool/aligned_depth_to_color/image_raw"/>
-	    <remap from="depth_registered/points" to="camera_tool/depth/color/points"/>
-	</node>   	
-
-
-   <!--Framos tool RealSense Colored PointCloud-->
-   <!--republish compressed images into raw images readable by the point_cloud_xyzrgb nodelet-->
-   <node pkg="image_transport" type="republish" name="camera_back_center_repub_image_rect_color" args="compressed in:=back_rs/color/image_raw raw out:=back_rs/color/image_raw"/>
-
-   <!-- Get RGBD registered Point Cloud from Intel -->
-   <node pkg="nodelet" type="nodelet" name="camera_back_center_colored_pcl" args="manager" output="screen" /> 
- 
-   <node pkg="nodelet" type="nodelet" name="camera_back_center_points_xyzrgb" args="load depth_image_proc/point_cloud_xyzrgb camera_back_center_colored_pcl --no-bond"> 
-	    <remap from="rgb/camera_info" to="back_rs/color/camera_info" />   
-	    <remap from="rgb/image_rect_color" to="back_rs/color/image_raw"/> 
-	    <remap from="depth_registered/image_rect" to="back_rs/aligned_depth_to_color/image_raw"/>
-	    <remap from="depth_registered/points" to="back_rs/depth/color/points"/>
-	</node> 
-
-
-
-
-       <!--Framos tool RealSense Colored PointCloud-->
-   <!--republish compressed images into raw images readable by the point_cloud_xyzrgb nodelet-->
-   <node pkg="image_transport" type="republish" name="camera_back_left_repub_image_rect_color" args="compressed in:=camera/color/image_raw raw out:=camera/color/image_raw"/>
-
-   <!-- Get RGBD registered Point Cloud from Intel -->
-   <node pkg="nodelet" type="nodelet" name="camera_back_left_colored_pcl" args="manager" output="screen" /> 
- 
-   <node pkg="nodelet" type="nodelet" name="camera_back_left_points_xyzrgb" args="load depth_image_proc/point_cloud_xyzrgb camera_back_left_colored_pcl --no-bond"> 
-	    <remap from="rgb/camera_info" to="camera/color/camera_info" />   
-	    <remap from="rgb/image_rect_color" to="camera/color/image_raw"/> 
-	    <remap from="depth_registered/image_rect" to="camera/aligned_depth_to_color/image_raw"/>
-	    <remap from="depth_registered/points" to="camera/depth/color/points"/>
-	</node> 
-	
+	<node pkg="tf2_ros" type="static_transform_publisher" name="base_to_radar" 	args="-0.33 0 1.9 3.09 0 0 bobcat_base navtech"/>	
 
 
     </group>

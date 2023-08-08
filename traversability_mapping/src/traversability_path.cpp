@@ -222,10 +222,10 @@ public:
         }
 
         // 2. Transform local paths to global paths
-        try{listener.lookupTransform("map","base_link", ros::Time(0), transform); } 
+        try{listener.lookupTransform("map","base_link2", ros::Time(0), transform); } 
         catch (tf::TransformException ex){ /*ROS_ERROR("Transfrom Failure.");*/ return; }
 
-        pathCloudLocal->header.frame_id = "base_link";
+        pathCloudLocal->header.frame_id = "base_link2";
         pathCloudLocal->header.stamp = 0; // don't use the latest time, we don't have that transform in the queue yet
 
         pcl_ros::transformPointCloud("map", *pathCloudLocal, *pathCloudGlobal, listener);
@@ -270,7 +270,7 @@ public:
             sensor_msgs::PointCloud2 laserCloudTemp;
             pcl::toROSMsg(*pathCloudLocal, laserCloudTemp);
             laserCloudTemp.header.stamp = ros::Time::now();
-            laserCloudTemp.header.frame_id = "base_link";
+            laserCloudTemp.header.frame_id = "base_link2";
             pubPathLibraryOrigin.publish(laserCloudTemp);
         }
     }
@@ -402,7 +402,7 @@ public:
         sensor_msgs::PointCloud2 laserCloudTemp;
         pcl::toROSMsg(*pathCloudValid, laserCloudTemp);
         laserCloudTemp.header.stamp = ros::Time::now();
-        laserCloudTemp.header.frame_id = "base_link";
+        laserCloudTemp.header.frame_id = "base_link2";
         pubPathLibraryValid.publish(laserCloudTemp);
     }
 };

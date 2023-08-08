@@ -69,16 +69,19 @@ typedef pcl::PointXYZI  PointType;
 typedef struct kdtree kdtree_t;
 typedef struct kdres kdres_t;
 
+std::string topico_info;
+std::string topico_filtrado;
+
 // Environment
-extern const bool urbanMapping = true;
+extern const bool urbanMapping = false;
 
 // VLP-16
 extern const int N_SCAN = 16;
 extern const int Horizon_SCAN = 1800;
 
 // Map Params
-extern const float mapResolution = 0.1; // map resolution
-extern const float mapCubeLength = 1.0; // the length of a sub-map (meters)
+extern const float mapResolution = 0.10; // map resolution
+extern const float mapCubeLength = 1.00; // the length of a sub-map (meters)
 extern const int mapCubeArrayLength = mapCubeLength / mapResolution; // the grid dimension of a sub-map (mapCubeLength / mapResolution)
 extern const int mapArrayLength = 2000 / mapCubeLength; // the sub-map dimension of global map (2000m x 2000m)
 extern const int rootCubeIndex = mapArrayLength / 2; // by default, robot is at the center of global map at the beginning
@@ -89,14 +92,14 @@ extern const int scanNumSlopeFilter = 10;
 extern const int scanNumMax = std::max(scanNumCurbFilter, scanNumSlopeFilter);
 
 // Filter Threshold Params
-extern const float sensorRangeLimit = 12; // only keep points with in ...   
-extern const float filterHeightLimit = (urbanMapping == true) ? 0.1 : 0.15; // step diff threshold         
+extern const float sensorRangeLimit = 20; // only keep points with in ...   
+extern const float filterHeightLimit = (urbanMapping == true) ? 0.12 : 0.16; // step diff threshold         
 extern const float filterAngleLimit = 20; // slope angle threshold          
 extern const int filterHeightMapArrayLength = sensorRangeLimit*2 / mapResolution;
 
 // BGK Prediction Params
 extern const bool predictionEnableFlag = true;
-extern const float predictionKernalSize = 0.2; // predict elevation within x meters
+extern const float predictionKernalSize = 0.25; // predict elevation within x meters
 
 // Occupancy Params
 extern const float p_occupied_when_laser = 0.9;
@@ -105,11 +108,11 @@ extern const float large_log_odds = 100;
 extern const float max_log_odds_for_belief = 20;
 
 // 2D Map Publish Params
-extern const int localMapLength = 20; // length of the local occupancy grid map (meter)
+extern const int localMapLength = 200; // length of the local occupancy grid map (meter)
 extern const int localMapArrayLength = localMapLength / mapResolution;
 
 // Visualization Params
-extern const float visualizationRadius = 50;
+extern const float visualizationRadius = 220;
 extern const float visualizationFrequency = 2; // n, skip n scans then publish, n=0, visualize at each scan
 
 // Robot Params
@@ -117,8 +120,8 @@ extern const float robotRadius = 0.2;
 extern const float sensorHeight = 0.5;
 
 // Traversability Params
-extern const int traversabilityObserveTimeTh = 10;
-extern const float traversabilityCalculatingDistance = 8.0;
+extern const int traversabilityObserveTimeTh = 5;
+extern const float traversabilityCalculatingDistance = 20.0;
 
 // Planning Cost Params
 extern const int NUM_COSTS = 3;

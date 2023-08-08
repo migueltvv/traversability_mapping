@@ -51,8 +51,7 @@ public:
         mapArrayCount(0){
         // subscribe to traversability filter
         subFilteredGroundCloud = nh.subscribe<sensor_msgs::PointCloud2>("/filtered_pointcloud", 5, &TraversabilityMapping::cloudHandler, this);
-        //subFilteredGroundCloud = nh.subscribe<sensor_msgs::PointCloud2>("/full_cloud_info_map", 5, &TraversabilityMapping::cloudHandler, this);
-        // publish local occupancy and elevation grid map0
+        // publish local occupancy and elevation grid map
         pubOccupancyMapLocal = nh.advertise<nav_msgs::OccupancyGrid> ("/occupancy_map_local", 5);
         pubOccupancyMapLocalHeight = nh.advertise<elevation_msgs::OccupancyElevation> ("/occupancy_map_local_height", 5);
         // publish elevation map for visualization
@@ -113,13 +112,17 @@ public:
         // publish local occupancy grid map
         publishMap();
     }
+  
 
     void updateElevationMap(){
         int cloudSize = laserCloud->points.size();
+        //if (laserCloud->points[i].z <= 0.3) 
         for (int i = 0; i < cloudSize; ++i){
+    
             laserCloud->points[i].z -= 0.2; // for visualization
             updateElevationMap(&laserCloud->points[i]);
-        }
+        
+      }
     }
 
     void updateElevationMap(PointType *point){
@@ -457,8 +460,8 @@ public:
     }    
 
     bool getRobotPosition(){
-        try{listener.lookupTransform("map","base_link", ros::Time(0), transform); }
-        catch (tf::TransformException ex){ ROS_ERROR("Transform3 Failure."); return false; }
+        try{listener.lookupTransform("map","base_link2", ros::Time(0), transform); } 
+        catch (tf::TransformException ex){ ROS_ERROR("Transfrom3 Failure."); return false; }
 
         robotPoint.x = transform.getOrigin().x();
         robotPoint.y = transform.getOrigin().y();

@@ -13,7 +13,7 @@ private:
     ros::Publisher pubCloudVisualHiRes;
     ros::Publisher pubCloudVisualLowRes;
     ros::Publisher pubLaserScan;
-    // Point Cloud
+    // Point Cloud muito linda
     pcl::PointCloud<PointType>::Ptr laserCloudIn; // projected full velodyne cloud
     pcl::PointCloud<PointType>::Ptr laserCloudOut; // filtered and downsampled point cloud
     pcl::PointCloud<PointType>::Ptr laserCloudObstacles; // cloud for saving points that are classified as obstables, convert them to laser scan
@@ -41,8 +41,9 @@ public:
     TraversabilityFilter():
         nh("~"){
 
-        subCloud = nh.subscribe<sensor_msgs::PointCloud2>("/full_cloud_info", 5, &TraversabilityFilter::cloudHandler, this); // chama a função cloudHandler da classe TravFIlter, ponteiro this passado ao construtor do
-        //subscritor
+        nh.param("topico_info", topico_info,std::string("/full_cloud_info"));
+
+        subCloud = nh.subscribe<sensor_msgs::PointCloud2>(topico_info, 5, &TraversabilityFilter::cloudHandler, this);
 
         pubCloud = nh.advertise<sensor_msgs::PointCloud2> ("/filtered_pointcloud", 5);
         pubCloudVisualHiRes = nh.advertise<sensor_msgs::PointCloud2> ("/filtered_pointcloud_visual_high_res", 5);
@@ -56,6 +57,7 @@ public:
 
     void allocateMemory(){
 
+try{
         laserCloudIn.reset(new pcl::PointCloud<PointType>());
         laserCloudOut.reset(new pcl::PointCloud<PointType>());
         laserCloudObstacles.reset(new pcl::PointCloud<PointType>());
@@ -85,9 +87,13 @@ public:
 
         resetParameters();
     }
+    catch(ros::Exception &e){
+            ROS_ERROR("ERROR_ALLOCATE========================================= %s\n",e.what());
+    }
+    }
 
     void resetParameters(){
-
+    try{
         laserCloudIn->clear();
         laserCloudOut->clear();
         laserCloudObstacles->clear();
@@ -100,27 +106,30 @@ public:
                 initFlag[i][j] = false;
                 obstFlag[i][j] = false;
             }
+            }
         }
+        catch(ros::Exception &e){
+            ROS_ERROR("ERROR_RESET========================================= %s\n",e.what());
     }
+    }
+    
 
     ~TraversabilityFilter(){}
 
 
     void cloudHandler(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg){
-        
+      try{  
         extractRawCloud(laserCloudMsg);
 
-        //bool transformCloudResult = transformCloud();
-        //ROS_INFO("Transform cloud result: %d", transformCloudResult);
-
-        //if (transformCloud() == false) return;
+        if (transformCloud() == false) return;
 
         cloud2Matrix();
 
         applyFilter();
 
         extractFilteredCloud();
-
+        ROS_INFO("Sensor limit");
+        ROS_INFO("%f",sensorRangeLimit);
         downsampleCloud();
 
         predictCloudBGK();
@@ -130,35 +139,57 @@ public:
         publishLaserScan();
 
         resetParameters();
+      }catch(ros::Exception &e){
+            ROS_ERROR("ERROR_HANDLER========================================= %s\n",e.what());
+    }
     }
 
     void extractRawCloud(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg){
+        try{
         // ROS msg -> PCL cloud
-        pcl::fromROSMsg(*laserCloudMsg, *laserCloudIn); //Passa o laserCloudin (mensagem ROS) para laserCloudMsg(Pointcloud),
+        pcl::fromROSMsg(*laserCloudMsg, *laserCloudIn);
         // extract range info
         for (int i = 0; i < N_SCAN; ++i){
             for (int j = 0; j < Horizon_SCAN; ++j){
                 int index = j  + i * Horizon_SCAN;
+                //Only consider points under robot height
+                if (laserCloudIn->points[index].z > -0.3) continue;
                 // skip NaN point
                 if (laserCloudIn->points[index].intensity == std::numeric_limits<float>::quiet_NaN()) continue;
                 // save range info
                 rangeMatrix.at<float>(i, j) = laserCloudIn->points[index].intensity;
+                
                 // reset obstacle status to 0 - free 
                 obstacleMatrix.at<int>(i, j) = 0;
             }
         }
+       ROS_INFO("Values from rangeMatrix:");
+        for (int i = 20; i < 30; ++i) {
+            ROS_INFO("%d , %f ",i, rangeMatrix.at<float>(i / Horizon_SCAN, i % Horizon_SCAN));
+        }
+
+        // Print values from laserCloudIn->points.intensity
+        ROS_INFO("Values from laserCloudIn->points.intensity:");
+        for (int i = 20; i < 30; ++i) {
+            ROS_INFO("%f", laserCloudIn->points[i].intensity);
+        }
+
+        }catch(ros::Exception &e){
+            ROS_ERROR("ERROR_RAW========================================= %s\n",e.what());
+    }
     }
 
     bool transformCloud(){
+        try{
         // Listen to the TF transform and prepare for point cloud transformation
-        try{listener.lookupTransform("map","base_link", ros::Time(0), transform);}
-        catch (tf::TransformException ex){ROS_WARN("Transform1 Failure.");return false; }
+        try{listener.lookupTransform("map","base_link2", ros::Time(0), transform); }
+        catch (tf::TransformException ex){ /*ROS_ERROR("Transfrom1 Failure.");*/ return false; }
 
         robotPoint.x = transform.getOrigin().x();
         robotPoint.y = transform.getOrigin().y();
         robotPoint.z = transform.getOrigin().z();
 
-        laserCloudIn->header.frame_id = "base_link";
+        laserCloudIn->header.frame_id = "base_link2";
         laserCloudIn->header.stamp = 0; // don't use the latest time, we don't have that transform in the queue yet
 
         pcl::PointCloud<PointType> laserCloudTemp;
@@ -166,10 +197,14 @@ public:
         *laserCloudIn = laserCloudTemp;
 
         return true;
+        }
+        catch(ros::Exception &e){
+            ROS_ERROR("ERROR_RAW========================================= %s\n",e.what());
+    }
     }
 
     void cloud2Matrix(){
-        ROS_INFO("\033[1;32m---->\033[0m Cloud2Matrix Started.");
+        try{
         for (int i = 0; i < N_SCAN; ++i){
             for (int j = 0; j < Horizon_SCAN; ++j){
                 int index = j  + i * Horizon_SCAN;
@@ -177,19 +212,27 @@ public:
                 laserCloudMatrix[i][j] = p;
             }
         }
+    }catch(ros::Exception &e){
+            ROS_ERROR("ERROR_RAW========================================= %s\n",e.what());
+    }
+
     }
 
     void applyFilter(){
-
+        try{
         if (urbanMapping == true){
-            //positiveCurbFilter();
-            //negativeCurbFilter();
+            positiveCurbFilter();
+            negativeCurbFilter();
         }
 
         slopeFilter();
+    }catch(ros::Exception &e){
+            ROS_ERROR("ERROR_RAW========================================= %s\n",e.what());
+    }
     }
 
     void positiveCurbFilter(){
+        try{
         int rangeCompareNeighborNum = 3;
         float diff[Horizon_SCAN - 1];
 
@@ -197,7 +240,10 @@ public:
             // calculate range difference
             for (int j = 0; j < Horizon_SCAN - 1; ++j)
                 diff[j] = rangeMatrix.at<float>(i, j) - rangeMatrix.at<float>(i, j+1);
-
+                  ROS_INFO("Difference from rangeMatrix:");
+        for (int i = 20; i < 30; ++i) {
+            ROS_INFO("%f",diff[i]);
+        }
             for (int j = rangeCompareNeighborNum; j < Horizon_SCAN - rangeCompareNeighborNum; ++j){
 
                 // Point that has been verified by other filters
@@ -229,10 +275,15 @@ public:
                 obstacleMatrix.at<int>(i, j) = 1;
             }
         }
+    } catch(ros::Exception &e){
+            ROS_ERROR("ERROR_RAW========================================= %s\n",e.what());
+    }
     }
 
     void negativeCurbFilter(){
+        try{
         int rangeCompareNeighborNum = 3;
+        
 
         for (int i = 0; i < scanNumCurbFilter; ++i){
             for (int j = 0; j < Horizon_SCAN; ++j){
@@ -261,10 +312,14 @@ public:
                 }
             }
         }
+    }catch(ros::Exception &e){
+            ROS_ERROR("ERROR_RAW========================================= %s\n",e.what());
+    }
     }
 
     void slopeFilter(){
         
+        try{
         for (int i = 0; i < scanNumSlopeFilter; ++i){
             for (int j = 0; j < Horizon_SCAN; ++j){
                 // Point that has been verified by other filters
@@ -297,11 +352,15 @@ public:
                 }
             }
         }
+        }catch(ros::Exception &e){
+            ROS_ERROR("ERROR========================================= %s\n",e.what());
+        }
     }
 
     
 
     void extractFilteredCloud(){
+        try {
         for (int i = 0; i < scanNumMax; ++i){
             for (int j = 0; j < Horizon_SCAN; ++j){
                 // invalid points and points too far are skipped
@@ -327,9 +386,13 @@ public:
             laserCloudTemp.header.frame_id = "map";
             pubCloudVisualHiRes.publish(laserCloudTemp);
         }
+    }catch(ros::Exception &e){
+            ROS_ERROR("ERROR_RAW========================================= %s\n",e.what());
+    }
     }
 
     void downsampleCloud(){
+        try{
 
         float roundedX = float(int(robotPoint.x * 10.0f)) / 10.0f;
         float roundedY = float(int(robotPoint.y * 10.0f)) / 10.0f;
@@ -394,6 +457,9 @@ public:
             laserCloudTemp.header.frame_id = "map";
             pubCloudVisualLowRes.publish(laserCloudTemp);
         }
+    } catch(ros::Exception &e){
+            ROS_ERROR("ERROR_RAW========================================= %s\n",e.what());
+    }
     }
 
     void predictCloudBGK(){
@@ -501,7 +567,7 @@ public:
         sensor_msgs::PointCloud2 laserCloudTemp;
         pcl::toROSMsg(*laserCloudOut, laserCloudTemp);
         laserCloudTemp.header.stamp = ros::Time::now();
-        laserCloudTemp.header.frame_id = "camera_init";
+        laserCloudTemp.header.frame_id = "map";
         pubCloud.publish(laserCloudTemp);
     }
 
@@ -517,14 +583,14 @@ public:
 
     void updateLaserScan(){
 
-        try{listener.lookupTransform("base_link","map", ros::Time(0), transform);}
-        catch (tf::TransformException ex){ /*ROS_ERROR("Transform2 Failure.");*/ return; }
+        try{listener.lookupTransform("base_link2","map", ros::Time(0), transform);}
+        catch (tf::TransformException ex){ /*ROS_ERROR("Transfrom2 Failure.");*/ return; }
 
         laserCloudObstacles->header.frame_id = "map";
         laserCloudObstacles->header.stamp = 0;
         // transform obstacle cloud back to "base_link" frame
         pcl::PointCloud<PointType> laserCloudTemp;
-        pcl_ros::transformPointCloud("base_link", *laserCloudObstacles, laserCloudTemp, listener);
+        pcl_ros::transformPointCloud("base_link2", *laserCloudObstacles, laserCloudTemp, listener);
         //convert point to scan
         int cloudSize = laserCloudTemp.points.size();
         for (int i = 0; i < cloudSize; ++i){
@@ -541,7 +607,7 @@ public:
 
     void pointcloud2laserscanInitialization(){
 
-        laserScan.header.frame_id = "base_link"; // assume laser has the same frame as the robot
+        laserScan.header.frame_id = "base_link2"; // assume laser has the same frame as the robot
 
         laserScan.angle_min = -M_PI;
         laserScan.angle_max =  M_PI;

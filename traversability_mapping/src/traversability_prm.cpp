@@ -392,7 +392,7 @@ public:
                 }
                 // 4.2 distance larger than x, too far to connect
                 float distanceBetween = distance(nearStates[i]->x, nearStates[j]->x);
-                if (distanceBetween > neighborConnectRadius || distanceBetween < 0.3){
+                if (distanceBetween > neighborConnectRadius || distanceBetween < 1.3){
                     deleteEdge(nearStates[i], nearStates[j]);
                     continue;
                 }
@@ -772,7 +772,7 @@ public:
     }
 
     void getRobotState(){
-        try{listener.lookupTransform("map","base_link", ros::Time(0), transform); } 
+        try{listener.lookupTransform("map","base_link2", ros::Time(0), transform); } 
         catch (tf::TransformException ex){ /*ROS_ERROR("Transfrom Failure.");*/ return; }
         robotState->x[0] = transform.getOrigin().x();
         robotState->x[1] = transform.getOrigin().y();
